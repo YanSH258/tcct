@@ -45,10 +45,14 @@ tcct abacus prepare-from-xyz xyz_files/ template abacus_tasks
 - 提示只陈述缺少日志、完成证据不完整、任务数不符等事实，不判断计算质量。
 
 ## `tcct abacus to-deepmd ROOT OUTPUT`
-- 输入：一批已完成的 ABACUS SCF、relax、cell-relax 或 MD 任务。
+- 输入：一批 ABACUS SCF、relax、cell-relax 或 MD 任务；默认提取已完成且可解析
+  的任务，未完成或解析失败的任务跳过（状态 SKIP 记入 `task_parse_audit.csv`），
+  stderr 给出跳过数量；全部任务都不可用时返回退出码 2 且不创建输出。
+- `--strict`：任一任务未完成或解析失败即终止且不创建输出。
 - 解析：自动读取 `INPUT` 中的 `calculation` 与 `basis_type`，选择 dpdata 官方的
   `abacus/{lcao,pw}/{scf,relax,md}` 格式，不使用模糊的通用解析模式。
-- 输出：`deepmd_npy/<exact_formula>/`、逐任务审计、逐帧 manifest、汇总和 SHA256。
+- 输出：`deepmd_npy/<exact_formula>/`、逐任务审计（含 SKIP 明细）、逐帧
+  manifest、汇总和 SHA256。
 - 默认要求 virial；不接受缺失标签，不覆盖非空输出目录。
 
 ## 依赖

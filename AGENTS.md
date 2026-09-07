@@ -33,7 +33,7 @@ DPA4 命令需要独立的 deepmd-kit + dftd3 环境（暂不随主环境安装�
 | 将多帧 Extended XYZ 或多个 XYZ 文件准备为独立 ABACUS 任务 | `tcct abacus prepare-from-xyz SOURCE TEMPLATE [OUTPUT]` |
 | 批量检查 ABACUS SCF/relax/cell-relax 任务 | `tcct abacus audit [ROOT]` |
 | 生成 ABACUS 批量任务 HTML/JSON/CSV/PNG 报告 | `tcct abacus report [ROOT]` |
-| 将完成的 ABACUS 任务转换为 DeepMD NPY | `tcct abacus to-deepmd ROOT OUTPUT` |
+| 将已完成的 ABACUS 任务转为 DeepMD NPY（未完成默认跳过） | `tcct abacus to-deepmd ROOT OUTPUT` |
 | 检查 ABACUS relax/cell-relax 并按需绘制收敛曲线 | `tcct abacus check-relax [DIR] [--plot]` |
 | 拿到一批 DeePMD 训练数据，先看规模、元素组成、能量/力范围 | `tcct deepmd stat [DIR]` |
 | 生成可复查的 DeepMD NPY 数据集统计与质量审计报告 | `tcct deepmd report DATASET_PATH` |

@@ -75,6 +75,7 @@ GROUPS = (
         CommandSpec("to-deepmd", to_deepmd, "从计算结果提取 DeepMD NPY", (
             ("root", "任务根目录", ".", False),
             ("output", "输出目录", "deepmd_from_abacus", False),
+            ("--strict", "存在未完成任务时中止 (y/n)", "n", True),
         )),
         CommandSpec("check-relax", check_relax, "检查结构优化并可绘制收敛曲线", (
             ("dir", "计算目录", ".", False),

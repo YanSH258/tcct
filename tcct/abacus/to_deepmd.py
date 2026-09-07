@@ -62,10 +62,15 @@ def to_deepmd(
     ),
     set_size: int = typer.Option(2000, min=1),
     expected: Optional[int] = typer.Option(None, help="预期任务数"),
-    skip_incomplete: bool = typer.Option(False, help="跳过未完成任务而不是终止"),
+    skip_incomplete: bool = typer.Option(
+        True,
+        "--skip-incomplete/--strict",
+        help="默认跳过未完成或解析失败的任务并提取其余；--strict 时任一任务"
+        "未完成或解析失败即终止且不创建输出",
+    ),
     require_virial: bool = typer.Option(True, "--virial/--no-virial"),
 ):
-    """ABACUS 结果转 DeepMD NPY。"""
+    """ABACUS 结果转 DeepMD NPY（默认提取已完成任务，跳过的记入审计 CSV）。"""
     if frames not in {"all", "final"}:
         typer.secho("错误: --frames 必须是 all 或 final", err=True, fg=typer.colors.RED)
         raise typer.Exit(1)
@@ -97,6 +102,15 @@ def to_deepmd(
     discovered_elements: set[str] = set()
     for task, state in task_states:
         if state["status"] != "PASS":
+            detail = state.get("detail") or state["status"]
+            audit_rows.append(
+                {
+                    "task": str(task),
+                    "format": "",
+                    "status": "SKIP",
+                    "error": f"{state['status']}: {detail}",
+                }
+            )
             continue
         row = {"task": str(task), "format": "", "status": "PENDING", "error": ""}
         try:
@@ -124,9 +138,14 @@ def to_deepmd(
                 }
             )
         except Exception as exc:
-            row.update({"status": "FAIL", "error": f"{type(exc).__name__}: {exc}"})
+            row.update(
+                {
+                    "status": "SKIP" if skip_incomplete else "FAIL",
+                    "error": f"{type(exc).__name__}: {exc}",
+                }
+            )
         audit_rows.append(row)
-    failed = [row for row in audit_rows if row["status"] != "PASS"]
+    failed = [row for row in audit_rows if row["status"] == "FAIL"]
     if failed:
         typer.secho(
             f"错误: {len(failed)} 个已完成任务无法解析；未创建输出",
@@ -134,6 +153,22 @@ def to_deepmd(
             fg=typer.colors.RED,
         )
         raise typer.Exit(2)
+    skipped = [row for row in audit_rows if row["status"] == "SKIP"]
+    if not parsed:
+        typer.secho(
+            f"错误: {len(skipped)}/{len(tasks)} 个任务未完成或无法解析，"
+            "没有可提取的任务；未创建输出",
+            err=True,
+            fg=typer.colors.RED,
+        )
+        raise typer.Exit(2)
+    if skipped:
+        typer.secho(
+            f"警告: 跳过 {len(skipped)}/{len(tasks)} 个任务"
+            "（未完成或解析失败），明细见 task_parse_audit.csv",
+            err=True,
+            fg=typer.colors.YELLOW,
+        )
 
     try:
         global_map = parse_type_map(type_map, discovered_elements)
@@ -199,6 +234,7 @@ def to_deepmd(
         "tasks_discovered": len(tasks),
         "tasks_parsed": len(parsed),
         "tasks_incomplete_skipped": len(incomplete),
+        "tasks_parse_failed_skipped": max(len(skipped) - len(incomplete), 0),
         "systems": len(system_rows),
         "frames": len(frame_rows),
         "all_systems_validated": all(
