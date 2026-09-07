@@ -66,7 +66,7 @@ def test_workflow_command_order():
         "to-deepmd",
         "check-relax",
     ]
-    assert commands["deepmd"] == ["stat", "report", "merge", "split"]
+    assert commands["deepmd"] == ["stat", "report", "merge", "split", "plot-parity"]
     assert commands["gpumd"] == [
         "npy-to-xyz",
         "plot-nep-evaluation",

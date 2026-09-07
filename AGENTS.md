@@ -37,6 +37,7 @@ DPA4 命令需要独立的 deepmd-kit + dftd3 环境（暂不随主环境安装�
 | 检查 ABACUS relax/cell-relax 并按需绘制收敛曲线 | `tcct abacus check-relax [DIR] [--plot]` |
 | 拿到一批 DeePMD 训练数据，先看规模、元素组成、能量/力范围 | `tcct deepmd stat [DIR]` |
 | 生成可复查的 DeepMD NPY 数据集统计与质量审计报告 | `tcct deepmd report DATASET_PATH` |
+| 绘制 dp test detail 文件的对角线图（能量/力/virial/应力） | `tcct deepmd plot-parity [DIR]` |
 | 按精确组成合并多个 DeepMD NPY 数据集 | `tcct deepmd merge INPUT... --output DIR` |
 | 可复现地划分 DeepMD NPY 训练集和测试集 | `tcct deepmd split DATASET --test-size 0.1` |
 | 需要程序化读取 DeePMD 数据集统计（接脚本/管道） | `tcct deepmd stat [DIR] --json` |

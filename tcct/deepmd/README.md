@@ -56,7 +56,27 @@ tcct deepmd split ./dataset -o split_uniform --test-size 100 --method uniform
 - 按精确化学组成合并，并统一 type map。
 - 默认拒绝重复的 cell+coord+atom-type 帧。
 
+## `tcct deepmd plot-parity [DIR]`（默认当前目录）
+- 输入：`dp test` 生成的 `detail.*.out` 数值表。对多 system 测试时每个 system
+  块前的 `#` 注释头（随数据拼接）会自动跳过。只画存在的文件，互不依赖：
+  `detail.e_peratom.out`（2 列）、`detail.f.out`（6 列，逐原子力）、
+  `detail.v_peratom.out`（18 列，9 分量合并）、`detail.s.out`（18 列，
+  eV/Å³ 换算为 GPa）。
+- 输出：默认在 DIR 写 `deepmd_parity.png`（每性质一个"预测 vs DFT"对角线
+  面板，最多 2×2；点数 ≥100000 自动改用二维密度图）和
+  `deepmd_parity_metrics.json`（逐性质 RMSE/MAE/R² 与点数）。stdout 汇报
+  各性质 RMSE。能量/virial 指标以 meV/atom、力以 meV/Å、应力以 GPa 显示。
+- 边界：总能量 `detail.e.out` 与总 virial `detail.v.out` 不参与绘图（绝对量
+  受体系能量基准主导，逐原子量才跨体系可比）；不做按 system 拆分，多 system
+  结果合并统计；输出文件已存在时拒绝覆盖（退出码 1），目录中没有任何
+  detail 文件时退出码 2。
+
+```bash
+cd stage26 && tcct deepmd plot-parity
+tcct deepmd plot-parity ./dp_test_out -o parity_v2.png
+```
+
 ## 依赖
 
 `stat` 仅依赖 numpy；`report` 需要 matplotlib 和 ASE（均延迟导入）；`merge` 和
-`split` 需要 dpdata（延迟导入）。
+`split` 需要 dpdata（延迟导入）；`plot-parity` 需要 matplotlib（延迟导入）。

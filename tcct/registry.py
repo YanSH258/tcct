@@ -14,6 +14,7 @@ from tcct.cp2k.audit import audit as cp2k_audit
 from tcct.cp2k.aimd_to_deepmd import aimd_to_deepmd
 from tcct.cp2k.singlepoint_to_deepmd import singlepoint_to_deepmd
 from tcct.deepmd.merge import merge
+from tcct.deepmd.plot_parity import plot_parity as deepmd_plot_parity
 from tcct.deepmd.report import report as deepmd_report
 from tcct.deepmd.split import split as deepmd_split
 from tcct.deepmd.stat import stat
@@ -136,6 +137,11 @@ GROUPS = (
             ("--test-size", "测试集比例或帧数", "0.1", False),
             ("--method", "选择方法 (random/uniform)", "random", False),
             ("--seed", "随机种子", "42", False),
+        )),
+        CommandSpec("plot-parity", deepmd_plot_parity, "绘制 dp test 对角线图 (E/F/V/S)", (
+            ("directory", "dp test 输出目录", ".", False),
+            ("--output", "输出图片", "deepmd_parity.png", False),
+            ("--metrics", "误差指标 JSON", "deepmd_parity_metrics.json", False),
         )),
     )),
     GroupSpec("7", "GPUMD", "gpumd", "train.xyz 准备与 NEP 结果分析", (
