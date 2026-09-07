@@ -91,6 +91,41 @@ class CommandTests(unittest.TestCase):
         self.assertEqual(cli.exit_code, 0, cli.output)
         self.assertTrue(report.is_file())
 
+    def test_abacus_audit_accepts_gpu_scf_marker(self):
+        task = self.root / "gpu_task"
+        out = task / "OUT.test"
+        out.mkdir(parents=True)
+        (task / "INPUT").write_text("INPUT_PARAMETERS\ncalculation scf\n")
+        (out / "running_scf.log").write_text(
+            "#SCF IS CONVERGED#\n"
+            "!FINAL_ETOT_IS -1.0 eV\n"
+            "TOTAL-FORCE (eV/Angstrom)\n"
+            "TOTAL-STRESS (KBAR)\n"
+            "Finish Time : now\n"
+        )
+        result = inspect_task(task)
+        self.assertTrue(result["scf_converged"])
+        self.assertEqual(result["status"], "PASS")
+        cli = self.runner.invoke(
+            app,
+            ["abacus", "audit", str(task), "-o", str(self.root / "gpu_audit.csv")],
+        )
+        self.assertEqual(cli.exit_code, 0, cli.output)
+        self.assertTrue((self.root / "gpu_audit.csv").is_file())
+
+    def test_abacus_audit_ignores_ionic_not_converged_wording(self):
+        task = self.root / "wording_task"
+        out = task / "OUT.test"
+        out.mkdir(parents=True)
+        (task / "INPUT").write_text("INPUT_PARAMETERS\ncalculation scf\n")
+        (out / "running_scf.log").write_text(
+            "Relaxation is not converged yet!\n"
+            "Finish Time : now\n"
+        )
+        result = inspect_task(task)
+        self.assertFalse(result["scf_converged"])
+        self.assertEqual(result["status"], "INCOMPLETE")
+
     def test_abacus_audit_passes_complete_md(self):
         task = self.root / "mdtask"
         out = task / "OUT.test"

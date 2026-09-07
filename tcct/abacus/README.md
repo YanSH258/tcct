@@ -13,7 +13,7 @@ ABACUS 任务的输入准备、批量审计、收敛分析与数据提取。每�
 
 ## `tcct abacus audit [ROOT]`
 - 输入：ROOT 下由 `INPUT` 标识的 ABACUS 任务目录。
-- 判断：正常结束、SCF/结构收敛、最终能量、力和应力证据。
+- 判断：正常结束、SCF/结构收敛（SCF 收敛标记兼容 CPU 与 GPU 构建）、最终能量、力和应力证据。
 - 输出：`abacus_audit.csv` 和 `abacus_audit.json`。
 - `--strict`：存在未完成任务时返回退出码 2。
 

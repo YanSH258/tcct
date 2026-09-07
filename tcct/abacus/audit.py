@@ -14,6 +14,13 @@ from tcct.common.io import write_csv, write_json
 
 _CALC_RE = re.compile(r"^\s*calculation\s+(\S+)", re.I | re.M)
 _BASIS_RE = re.compile(r"^\s*basis_type\s+(\S+)", re.I | re.M)
+# SCF 收敛标记：CPU 构建打印 "charge density convergence is achieved"，
+# GPU 构建打印 "#SCF IS CONVERGED#"。不做更宽的匹配（例如裸词 converged），
+# 以免被 "Relaxation is not converged yet!" 之类的行误触发。
+_SCF_CONV_RE = re.compile(
+    r"charge\s+density\s+convergence\s+is\s+achieved|#\s*SCF\s+IS\s+CONVERGED\s*#",
+    re.IGNORECASE,
+)
 
 
 def parse_calculation(task: Path) -> str:
@@ -73,7 +80,7 @@ def inspect_task(task: Path) -> dict:
     text = log.read_text(errors="replace")
     row.update(
         {
-            "scf_converged": "charge density convergence is achieved" in text,
+            "scf_converged": bool(_SCF_CONV_RE.search(text)),
             "relax_converged": "Relaxation is converged" in text,
             "final_energy": "!FINAL_ETOT_IS" in text,
             "finish_time": "Finish Time" in text,
