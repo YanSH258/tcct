@@ -41,7 +41,7 @@ def _fake_execute(captured):
 
 def test_main_menu_order_and_descriptions():
     assert [(group.menu_key, group.display_name, group.cli_help) for group in GROUPS] == [
-        ("1", "Structure", "单个结构文件转换"),
+        ("1", "Structure", "结构转换与几何检查"),
         ("2", "ABACUS", "输入准备、计算检查与数据提取"),
         ("3", "CP2K", "计算检查与数据提取"),
         ("4", "VASP", "OUTCAR 数据提取"),

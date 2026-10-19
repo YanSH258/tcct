@@ -57,6 +57,7 @@ DPA4 命令需要独立的 deepmd-kit + dftd3 环境（暂不随主环境安装�
 | 收集 CP2K 单点能量和力为 DeepMD NPY | `tcct cp2k singlepoint-to-deepmd [ROOT] [OUTPUT]` |
 | 将 CP2K AIMD 原生轨迹转为 DeepMD NPY | `tcct cp2k aimd-to-deepmd [ROOT] [OUTPUT]` |
 | 将 VASP OUTCAR 转换为按组成拆分的 DeepMD NPY | `tcct vasp outcar-to-deepmd [ROOT] [OUTPUT]` |
+| 检查结构或轨迹中的过近原子（含周期像） | `tcct structure check-geometry [INPUT]` |
 | 在 CIF、Extended XYZ、POSCAR 间转换或生成带赝势引用的 STRU | `tcct structure convert INPUT --to cif\|xyz\|poscar\|stru` |
 
 ## 命令的输入/输出约定

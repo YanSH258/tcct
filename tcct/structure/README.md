@@ -35,3 +35,24 @@ tcct structure convert frame.extxyz --to stru
 
 格式转换不会判断某套赝势是否适合具体研究。续接已有计算或机器学习数据时，应使用原项目
 完全相同的赝势文件；使用 `--json` 可记录文件名和 SHA-256。
+
+## `tcct structure check-geometry [INPUT]`
+
+只读检查 `d < ratio × (r_cov_i + r_cov_j)`，默认 ratio=0.7。沿用表面催化项目
+geometry_filter.py 的 ASE 邻居表判据，包括周期自身镜像，遵循输入 PBC。
+普通 XYZ 按非周期结构检查；几何通过不代表能量稳定。
+
+- 输入默认当前目录，支持 ASE 可读的单帧/多帧文件；目录递归发现
+  `.xyz/.extxyz/.cif/.vasp`、`POSCAR/CONTCAR`。
+- `--pattern` 指定目录 glob，`--format` 指定 ASE 格式；CIF 复用现有 pymatgen
+  空间群展开读取器。依赖：`pip install 'tcct[structure]'`。
+- `--ratio` 必须为有限正数。`--output/-o` 默认当前目录 `geometry_check.json`，拒绝覆盖。
+- JSON 记录源文件、帧号、原子数、PBC、异常原子对、周期像偏移、距离和阈值（Å）。
+  帧号和原子索引从 0 开始。不修改输入；读取失败不生成部分报告。
+- 退出码：0 全部通过，1 参数/读写错误，2 发现过近原子。
+
+```bash
+tcct structure check-geometry trajectory.xyz
+tcct structure check-geometry structures/ --ratio 0.7
+tcct structure check-geometry structures/ --pattern '**/*.extxyz' -o audit.json
+```

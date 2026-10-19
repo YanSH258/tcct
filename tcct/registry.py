@@ -31,6 +31,7 @@ from tcct.gpumd.merge_loss import merge_loss
 from tcct.gpumd.plot_nep_evaluation import plot_nep_evaluation
 from tcct.gpumd.thermo import thermo
 from tcct.structure.convert import convert as structure_convert
+from tcct.structure.check_geometry import check_geometry
 from tcct.vasp.outcar_to_deepmd import outcar_to_deepmd
 
 
@@ -55,11 +56,15 @@ class GroupSpec:
 
 
 GROUPS = (
-    GroupSpec("1", "Structure", "structure", "单个结构文件转换", (
+    GroupSpec("1", "Structure", "structure", "结构转换与几何检查", (
         CommandSpec("convert", structure_convert, "CIF/POSCAR/STRU/XYZ 相互转换", (
             ("input", "输入 CIF / POSCAR / Extended XYZ", "structure.cif", False),
             ("--to", "目标格式 (cif/xyz/poscar/stru)", "xyz", False),
             ("--basis", "STRU 基组 (pw/lcao)", "pw", False),
+        )),
+        CommandSpec("check-geometry", check_geometry, "按共价半径筛查过近原子（含周期像）", (
+            ("input", "结构文件或目录", ".", False),
+            ("--ratio", "共价半径比例", "0.7", False),
         )),
     )),
     GroupSpec("2", "ABACUS", "abacus", "输入准备、计算检查与数据提取", (
